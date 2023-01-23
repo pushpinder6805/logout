@@ -1,0 +1,14 @@
+.user-menu.revamped .bottom-tabs {
+  height: 100%;
+}
+
+#user-menu-button-quick-logout {
+  margin-top: auto;
+  margin-bottom: 0.55em;
+  .mobile-view & {
+    margin-bottom: 0.25em;
+  }
+  .d-icon {
+    fill: $logout-icon-color;
+  }
+}

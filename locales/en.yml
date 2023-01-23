@@ -1,0 +1,4 @@
+en:
+  theme_metadata:
+    description: "Adds an easier-to-locate logout button to the tabs within the user menu"
+  quick_logout: "Log out"

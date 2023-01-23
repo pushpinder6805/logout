@@ -1,0 +1,5 @@
+logout_icon:
+  default: "sign-out-alt"
+
+logout_icon_color:
+  default: "var(--primary-medium)"
