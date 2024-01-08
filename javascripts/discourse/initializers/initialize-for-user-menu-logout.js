@@ -1,3 +1,4 @@
+import { cached } from "@glimmer/tracking";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import logout from "discourse/lib/logout";
 import UserMenuTab from "discourse/lib/user-menu/tab";
@@ -57,7 +58,8 @@ export default {
       api.modifyClass("component:user-menu/menu", {
         pluginId: "quick-logout-component",
 
-        get _bottomTabs() {
+        @cached
+        get bottomTabs() {
           const tabs = [];
 
           CORE_BOTTOM_TABS.forEach((tabClass) => {
