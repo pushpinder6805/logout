@@ -1,85 +1,29 @@
-import { cached } from "@glimmer/tracking";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import logout from "discourse/lib/logout";
-import UserMenuTab from "discourse/lib/user-menu/tab";
 import I18n from "I18n";
 
-const CORE_BOTTOM_TABS = [
-  // default tab from core
-  class extends UserMenuTab {
-    get id() {
-      return "profile";
-    }
-
-    get icon() {
-      return "user";
-    }
-
-    get panelComponent() {
-      return "user-menu/profile-tab-content";
-    }
-
-    get linkWhenActive() {
-      return `${this.currentUser.path}/summary`;
-    }
-  },
-
-  // our custom quick logout tab
-  class extends UserMenuTab {
-    get id() {
-      return "quick-logout";
-    }
-
-    get icon() {
-      return settings.logout_icon;
-    }
-
-    get panelComponent() {
-      if (this.currentUser) {
-        this.currentUser
-          .destroySession()
-          .then((response) => logout({ redirect: response["redirect_url"] }));
-      }
-    }
-
-    get title() {
-      return I18n.t(themePrefix("quick_logout"));
-    }
-  },
-];
-
 export default {
-  name: "quick-logout-component",
+  name: "header-logout-component",
 
   initialize() {
     withPluginApi("1.2.0", (api) => {
-      // verbatim from core, just ensuring we pick up our custom tab
+      const currentUser = api.getCurrentUser();
 
-      api.modifyClass("component:user-menu/menu", {
-        pluginId: "quick-logout-component",
-
-        @cached
-        get bottomTabs() {
-          const tabs = [];
-
-          CORE_BOTTOM_TABS.forEach((tabClass) => {
-            const tab = new tabClass(
-              this.currentUser,
-              this.siteSettings,
-              this.site
-            );
-            if (tab.shouldDisplay) {
-              tabs.push(tab);
+      if (currentUser) {
+        // Add a logout button to the header
+        api.headerButtons("quick-logout", {
+          className: "btn btn-icon btn-flat logout-button",
+          title: I18n.t(themePrefix("quick_logout")), // Use localization for the button title
+          icon: settings.logout_icon || "power-off", // Use custom icon or default to "power-off"
+          action() {
+            if (confirm(I18n.t(themePrefix("quick_logout_confirm")))) {
+              currentUser
+                .destroySession()
+                .then((response) => logout({ redirect: response.redirect_url }));
             }
-          });
-
-          const topTabsLength = this.topTabs.length;
-          return tabs.map((tab, index) => {
-            tab.position = index + topTabsLength;
-            return tab;
-          });
-        },
-      });
+          },
+        }, { before: "auth" }); // Place the button before auth buttons
+      }
     });
   },
 };
